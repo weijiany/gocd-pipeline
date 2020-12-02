@@ -1,0 +1,22 @@
+version: "3.8"
+services:
+  gocd-server:
+    image: gocd/gocd-server:v20.9.0
+    ports:
+      - "8153:8153"
+    volumes:
+      - ./godata/config/cruise-config.xml:/godata/config/cruise-config.xml
+      - ./godata:/godata
+    privileged: true
+
+  gocd-agent-dind1:
+    user: "0:0"
+    image: gocd/gocd-agent-docker-dind:v20.9.0
+    environment:
+      AGENT_AUTO_REGISTER_KEY: d1efc476-5838-4887-96ce-95b91e92258a
+      GO_SERVER_URL: http://gocd-server:8153/go
+    depends_on:
+      - gocd-server
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    privileged: true
